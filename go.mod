@@ -1,4 +1,4 @@
-module simonpartner
+module simondesktop
 
 go 1.26.2
 

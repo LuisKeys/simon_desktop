@@ -9,15 +9,26 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"strconv"
 
 	"github.com/LuisKeys/simon"
 	"github.com/LuisKeys/simon/memory"
 	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 
-	"simonpartner/internal/conversations"
-	"simonpartner/internal/persistence"
-	"simonpartner/internal/platform"
-	"simonpartner/internal/sessions"
+	"simondesktop/internal/conversations"
+	"simondesktop/internal/persistence"
+	"simondesktop/internal/platform"
+	"simondesktop/internal/sessions"
+)
+
+// Settings keys used to persist the window's position and maximized state
+// across restarts. Window size is deliberately not stored here: it is
+// already driven by the ui.scale setting (see SetWindowScale), which the
+// frontend applies on every startup.
+const (
+	settingWindowX         = "window.x"
+	settingWindowY         = "window.y"
+	settingWindowMaximized = "window.maximized"
 )
 
 // BaseWindowWidth and BaseWindowHeight are the window's dimensions at 100%
@@ -78,6 +89,60 @@ func (a *AppService) Startup(ctx context.Context) {
 	}
 	a.runtime = rt
 	a.sessionManager = sessions.NewManager(rt)
+
+	a.restoreWindowPosition()
+}
+
+// restoreWindowPosition moves the window to wherever it was when the app
+// last closed, if a position was recorded.
+func (a *AppService) restoreWindowPosition() {
+	if a.repositories == nil {
+		return
+	}
+
+	if maximized, found, _ := a.repositories.Settings.Get(a.ctx, settingWindowMaximized); found && maximized == "true" {
+		wailsruntime.WindowMaximise(a.ctx)
+		return
+	}
+
+	xStr, xFound, _ := a.repositories.Settings.Get(a.ctx, settingWindowX)
+	yStr, yFound, _ := a.repositories.Settings.Get(a.ctx, settingWindowY)
+	if !xFound || !yFound {
+		return
+	}
+	x, xErr := strconv.Atoi(xStr)
+	y, yErr := strconv.Atoi(yStr)
+	if xErr != nil || yErr != nil {
+		return
+	}
+	wailsruntime.WindowSetPosition(a.ctx, x, y)
+}
+
+// BeforeClose records the window's current position (and whether it is
+// maximized) so it can be restored on the next launch. It is wired to
+// Wails' OnBeforeClose hook and never itself prevents the app from
+// closing.
+func (a *AppService) BeforeClose(ctx context.Context) bool {
+	if a.repositories == nil {
+		return false
+	}
+
+	maximized := wailsruntime.WindowIsMaximised(ctx)
+	if err := a.repositories.Settings.Set(ctx, settingWindowMaximized, strconv.FormatBool(maximized)); err != nil {
+		log.Printf("simondesktop: could not save window state: %v", err)
+	}
+
+	if !maximized {
+		x, y := wailsruntime.WindowGetPosition(ctx)
+		if err := a.repositories.Settings.Set(ctx, settingWindowX, strconv.Itoa(x)); err != nil {
+			log.Printf("simondesktop: could not save window position: %v", err)
+		}
+		if err := a.repositories.Settings.Set(ctx, settingWindowY, strconv.Itoa(y)); err != nil {
+			log.Printf("simondesktop: could not save window position: %v", err)
+		}
+	}
+
+	return false
 }
 
 // Shutdown closes the Runtime (and every Session it created) and the

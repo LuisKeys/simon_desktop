@@ -3,8 +3,8 @@ package app
 import (
 	"database/sql"
 
-	"simonpartner/internal/conversations"
-	"simonpartner/internal/settings"
+	"simondesktop/internal/conversations"
+	"simondesktop/internal/settings"
 )
 
 // Repositories groups every SQLite-backed repository AppService uses.

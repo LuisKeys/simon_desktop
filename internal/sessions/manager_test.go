@@ -7,7 +7,7 @@ import (
 	"github.com/LuisKeys/simon"
 	"github.com/LuisKeys/simon/model"
 
-	"simonpartner/internal/sessions"
+	"simondesktop/internal/sessions"
 )
 
 func newTestRuntime(t *testing.T) *simon.Runtime {

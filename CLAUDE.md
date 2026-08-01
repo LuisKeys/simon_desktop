@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Simon Desktop (module `simonpartner`) is a Wails v2 desktop app: a Go backend wrapping the
+Simon Desktop (module `simondesktop`) is a Wails v2 desktop app: a Go backend wrapping the
 `github.com/LuisKeys/simon` agent runtime, with a React/TypeScript frontend. It's a personal
 document assistant — chat UI backed by an LLM agent runtime that supports OpenAI, Anthropic, and
 Ollama providers.

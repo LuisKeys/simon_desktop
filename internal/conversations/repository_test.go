@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"simonpartner/internal/conversations"
-	"simonpartner/internal/persistence"
+	"simondesktop/internal/conversations"
+	"simondesktop/internal/persistence"
 )
 
 func TestCreateAndList(t *testing.T) {

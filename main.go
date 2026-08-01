@@ -7,7 +7,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 
-	"simonpartner/internal/app"
+	"simondesktop/internal/app"
 )
 
 //go:embed all:frontend/dist
@@ -26,6 +26,7 @@ func main() {
 		BackgroundColour: &options.RGBA{R: 13, G: 13, B: 13, A: 1},
 		OnStartup:        svc.Startup,
 		OnShutdown:       svc.Shutdown,
+		OnBeforeClose:    svc.BeforeClose,
 		Bind: []interface{}{
 			svc,
 		},
