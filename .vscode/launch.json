@@ -10,10 +10,7 @@
       "program": "${workspaceFolder}",
       "envFile": "${workspaceFolder}/.env",
       "cwd": "${workspaceFolder}",
-      "buildFlags": "-tags dev",
-      "env": {
-        "CGO_LDFLAGS": "-framework UniformTypeIdentifiers"
-      }
+      "buildFlags": "-tags dev,webkit2_41"
     }
   ]
 }
