@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 
 	"github.com/LuisKeys/simon"
 	"github.com/LuisKeys/simon/memory"
@@ -17,6 +18,14 @@ import (
 	"simonpartner/internal/persistence"
 	"simonpartner/internal/platform"
 	"simonpartner/internal/sessions"
+)
+
+// BaseWindowWidth and BaseWindowHeight are the window's dimensions at 100%
+// UI scale; main.go uses these as the initial window size, and
+// SetWindowScale multiplies them by the user's chosen scale factor.
+const (
+	BaseWindowWidth  = 1200
+	BaseWindowHeight = 800
 )
 
 // AppService is the facade Wails binds to the frontend. It owns the single
@@ -142,6 +151,36 @@ func (a *AppService) SendMessage(conversationID string, text string) error {
 	}
 
 	go a.consumeRun(conversationID, events)
+	return nil
+}
+
+// GetSetting returns the stored value for key, or "" if it has never been
+// set.
+func (a *AppService) GetSetting(key string) (string, error) {
+	if a.repositories == nil {
+		return "", fmt.Errorf("simondesktop: not initialized")
+	}
+	value, _, err := a.repositories.Settings.Get(a.ctx, key)
+	return value, err
+}
+
+// SetSetting stores value under key, overwriting any existing value.
+func (a *AppService) SetSetting(key string, value string) error {
+	if a.repositories == nil {
+		return fmt.Errorf("simondesktop: not initialized")
+	}
+	return a.repositories.Settings.Set(a.ctx, key, value)
+}
+
+// SetWindowScale resizes the window to BaseWindowWidth/BaseWindowHeight
+// scaled by factor, so the window grows along with the UI's font size.
+func (a *AppService) SetWindowScale(factor float64) error {
+	if factor <= 0 {
+		return fmt.Errorf("simondesktop: invalid scale factor")
+	}
+	width := int(math.Round(BaseWindowWidth * factor))
+	height := int(math.Round(BaseWindowHeight * factor))
+	wailsruntime.WindowSetSize(a.ctx, width, height)
 	return nil
 }
 

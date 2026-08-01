@@ -18,8 +18,8 @@ func main() {
 
 	err := wails.Run(&options.App{
 		Title:  "Simon Desktop",
-		Width:  1200,
-		Height: 800,
+		Width:  app.BaseWindowWidth,
+		Height: app.BaseWindowHeight,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},

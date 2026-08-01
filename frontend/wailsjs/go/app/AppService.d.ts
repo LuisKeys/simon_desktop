@@ -9,6 +9,12 @@ export function CreateConversation():Promise<conversations.Conversation>;
 
 export function GetConversationMessages(arg1:string):Promise<Array<sessions.ChatMessage>>;
 
+export function GetSetting(arg1:string):Promise<string>;
+
 export function ListConversations():Promise<Array<conversations.Conversation>>;
 
 export function SendMessage(arg1:string,arg2:string):Promise<void>;
+
+export function SetSetting(arg1:string,arg2:string):Promise<void>;
+
+export function SetWindowScale(arg1:number):Promise<void>;

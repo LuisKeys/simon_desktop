@@ -14,10 +14,22 @@ export function GetConversationMessages(arg1) {
   return window['go']['app']['AppService']['GetConversationMessages'](arg1);
 }
 
+export function GetSetting(arg1) {
+  return window['go']['app']['AppService']['GetSetting'](arg1);
+}
+
 export function ListConversations() {
   return window['go']['app']['AppService']['ListConversations']();
 }
 
 export function SendMessage(arg1, arg2) {
   return window['go']['app']['AppService']['SendMessage'](arg1, arg2);
+}
+
+export function SetSetting(arg1, arg2) {
+  return window['go']['app']['AppService']['SetSetting'](arg1, arg2);
+}
+
+export function SetWindowScale(arg1) {
+  return window['go']['app']['AppService']['SetWindowScale'](arg1);
 }

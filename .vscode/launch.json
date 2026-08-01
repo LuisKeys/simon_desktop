@@ -6,7 +6,7 @@
       "type": "go",
       "request": "launch",
       "mode": "debug",
-      "preLaunchTask": "clean-debug-bin",
+      "preLaunchTask": "prelaunch",
       "program": "${workspaceFolder}",
       "envFile": "${workspaceFolder}/.env",
       "cwd": "${workspaceFolder}",

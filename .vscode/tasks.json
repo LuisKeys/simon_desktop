@@ -6,6 +6,18 @@
       "type": "shell",
       "command": "rm -f ${workspaceFolder}/__debug_bin*",
       "problemMatcher": []
+    },
+    {
+      "label": "build-frontend",
+      "type": "shell",
+      "command": "bash -lc 'export NVM_DIR=\"$HOME/.nvm\"; [ -s \"$NVM_DIR/nvm.sh\" ] && source \"$NVM_DIR/nvm.sh\"; nvm use 22 >/dev/null 2>&1; cd \"${workspaceFolder}/frontend\" && npm run build'",
+      "problemMatcher": []
+    },
+    {
+      "label": "prelaunch",
+      "dependsOrder": "sequence",
+      "dependsOn": ["build-frontend", "clean-debug-bin"],
+      "problemMatcher": []
     }
   ]
 }

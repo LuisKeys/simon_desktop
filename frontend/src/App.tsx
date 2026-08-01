@@ -3,6 +3,7 @@ import './App.css'
 import {CreateConversation, ListConversations} from '../wailsjs/go/app/AppService'
 import {conversations} from '../wailsjs/go/models'
 import Chat from './Chat'
+import SettingsMenu from './settings/SettingsMenu'
 
 function formatUpdatedAt(value: string): string {
     const date = new Date(value)
@@ -58,25 +59,28 @@ function App() {
         <div id="App">
             <div id="skeleton">
                 <div id="sidebar">
-                    <div id="logo-mark" aria-hidden="true">
-                        <svg viewBox="0 0 100 100" width="40" height="40">
-                            <polygon
-                                points="50,4 90,27 90,73 50,96 10,73 10,27"
-                                fill="none"
-                                stroke="#FF6A00"
-                                strokeWidth="4"
-                            />
-                            <path
-                                d="M32 40 C32 25, 40 20, 40 32 C44 24, 56 24, 60 32 C60 20, 68 25, 68 40 Z"
-                                fill="none"
-                                stroke="#F5F5F5"
-                                strokeWidth="3"
-                            />
-                            <circle cx="40" cy="46" r="2.5" fill="#F5F5F5"/>
-                            <circle cx="60" cy="46" r="2.5" fill="#F5F5F5"/>
-                            <text x="50" y="62" textAnchor="middle" fill="#FF6A00" fontSize="14" fontFamily="monospace">&gt;_</text>
-                        </svg>
-                        <span>Simon</span>
+                    <div id="logo-mark">
+                        <div className="logo-mark-brand" aria-hidden="true">
+                            <svg viewBox="0 0 100 100">
+                                <polygon
+                                    points="50,4 90,27 90,73 50,96 10,73 10,27"
+                                    fill="none"
+                                    stroke="#FF6A00"
+                                    strokeWidth="4"
+                                />
+                                <path
+                                    d="M32 40 C32 25, 40 20, 40 32 C44 24, 56 24, 60 32 C60 20, 68 25, 68 40 Z"
+                                    fill="none"
+                                    stroke="var(--color-text)"
+                                    strokeWidth="3"
+                                />
+                                <circle cx="40" cy="46" r="2.5" fill="var(--color-text)"/>
+                                <circle cx="60" cy="46" r="2.5" fill="var(--color-text)"/>
+                                <text x="50" y="62" textAnchor="middle" fill="#FF6A00" fontSize="14" fontFamily="monospace">&gt;_</text>
+                            </svg>
+                            <span>Simon</span>
+                        </div>
+                        <SettingsMenu/>
                     </div>
 
                     <button id="new-chat" onClick={handleNewChat}>+ New chat</button>
