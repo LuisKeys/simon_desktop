@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useState} from 'react'
 import './App.css'
-import {CreateConversation, ListConversations} from '../wailsjs/go/app/AppService'
+import {CreateConversation, DeleteConversation, ListConversations} from '../wailsjs/go/app/AppService'
 import {conversations} from '../wailsjs/go/models'
 import Chat from './Chat'
 import SettingsMenu from './settings/SettingsMenu'
@@ -23,6 +23,8 @@ function App() {
     const [activeId, setActiveId] = useState<string | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+    const [deleting, setDeleting] = useState(false)
 
     const refreshConversations = useCallback(() => {
         ListConversations()
@@ -53,7 +55,30 @@ function App() {
         }
     }
 
+    async function handleConfirmDelete() {
+        if (!pendingDeleteId) {
+            return
+        }
+        const deletedId = pendingDeleteId
+        setDeleting(true)
+        setError(null)
+        try {
+            await DeleteConversation(deletedId)
+            setConversationList((prev) => {
+                const next = prev.filter((c) => c.id !== deletedId)
+                setActiveId((current) => (current === deletedId ? next[0]?.id ?? null : current))
+                return next
+            })
+        } catch {
+            setError('Could not delete the conversation.')
+        } finally {
+            setDeleting(false)
+            setPendingDeleteId(null)
+        }
+    }
+
     const activeConversation = conversationList.find((c) => c.id === activeId) ?? null
+    const pendingDeleteConversation = conversationList.find((c) => c.id === pendingDeleteId) ?? null
 
     return (
         <div id="App">
@@ -91,14 +116,32 @@ function App() {
                             <div className="muted">No conversations yet</div>
                         )}
                         {conversationList.map((c) => (
-                            <button
+                            <div
                                 key={c.id}
                                 className={'conversation-item' + (c.id === activeId ? ' active' : '')}
-                                onClick={() => setActiveId(c.id)}
                             >
-                                <span className="conversation-title">{c.title}</span>
-                                <span className="conversation-date">{formatUpdatedAt(c.updatedAt as unknown as string)}</span>
-                            </button>
+                                <button className="conversation-select" onClick={() => setActiveId(c.id)}>
+                                    <span className="conversation-title">{c.title}</span>
+                                    <span className="conversation-date">{formatUpdatedAt(c.updatedAt as unknown as string)}</span>
+                                </button>
+                                <button
+                                    className="conversation-delete"
+                                    aria-label="Delete conversation"
+                                    title="Delete conversation"
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        setPendingDeleteId(c.id)
+                                    }}
+                                >
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <polyline points="3 6 5 6 21 6"/>
+                                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                        <path d="M10 11v6"/>
+                                        <path d="M14 11v6"/>
+                                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                                    </svg>
+                                </button>
+                            </div>
                         ))}
                     </div>
 
@@ -126,6 +169,33 @@ function App() {
                     )}
                 </div>
             </div>
+
+            {pendingDeleteConversation && (
+                <div id="delete-confirm-overlay" onClick={() => !deleting && setPendingDeleteId(null)}>
+                    <div id="delete-confirm-dialog" onClick={(e) => e.stopPropagation()}>
+                        <p id="delete-confirm-title">Delete conversation?</p>
+                        <p className="muted">
+                            "{pendingDeleteConversation.title}" will be permanently deleted. This cannot be undone.
+                        </p>
+                        <div id="delete-confirm-actions">
+                            <button
+                                id="delete-confirm-cancel"
+                                onClick={() => setPendingDeleteId(null)}
+                                disabled={deleting}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                id="delete-confirm-delete"
+                                onClick={handleConfirmDelete}
+                                disabled={deleting}
+                            >
+                                {deleting ? 'Deleting…' : 'Delete'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

@@ -61,3 +61,18 @@ func (m *Manager) Cancel(conversationID string) {
 		sess.Cancel()
 	}
 }
+
+// Remove cancels conversationID's active run (if any), closes its session,
+// and drops it from the Manager so a later SendMessage creates a fresh one.
+// A no-op if no session has been created for conversationID.
+func (m *Manager) Remove(conversationID string) {
+	m.mu.Lock()
+	sess, ok := m.sessions[conversationID]
+	delete(m.sessions, conversationID)
+	m.mu.Unlock()
+
+	if ok {
+		sess.Cancel()
+		sess.Close()
+	}
+}

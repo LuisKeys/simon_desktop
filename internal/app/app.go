@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"os"
+	"path/filepath"
 	"strconv"
 
 	"github.com/LuisKeys/simon"
@@ -176,6 +178,32 @@ func (a *AppService) ListConversations() ([]conversations.Conversation, error) {
 		return nil, fmt.Errorf("simondesktop: not initialized")
 	}
 	return a.repositories.Conversations.List(a.ctx)
+}
+
+// DeleteConversation permanently removes conversationID: its live session
+// (if any), its metadata row, and its chat history file on disk.
+func (a *AppService) DeleteConversation(conversationID string) error {
+	if a.repositories == nil {
+		return fmt.Errorf("simondesktop: not initialized")
+	}
+
+	if a.sessionManager != nil {
+		a.sessionManager.Remove(conversationID)
+	}
+
+	if err := a.repositories.Conversations.Delete(a.ctx, conversationID); err != nil {
+		log.Printf("simondesktop: could not delete conversation %s: %v", conversationID, err)
+		return errors.New("Could not delete the conversation.")
+	}
+
+	if a.paths.ChatsDir != "" {
+		historyPath := filepath.Join(a.paths.ChatsDir, conversationID+".json")
+		if err := os.Remove(historyPath); err != nil && !os.IsNotExist(err) {
+			log.Printf("simondesktop: could not remove chat history file for %s: %v", conversationID, err)
+		}
+	}
+
+	return nil
 }
 
 // GetConversationMessages returns conversationID's user/assistant history.

@@ -60,6 +60,12 @@ func (r *Repository) List(ctx context.Context) ([]Conversation, error) {
 	return out, rows.Err()
 }
 
+// Delete removes conversationID's metadata row.
+func (r *Repository) Delete(ctx context.Context, conversationID string) error {
+	_, err := r.db.ExecContext(ctx, `DELETE FROM conversations WHERE id = ?`, conversationID)
+	return err
+}
+
 // RecordMessage bumps conversationID's updated_at to now and, if it still
 // has DefaultTitle, derives a title from the first user message.
 func (r *Repository) RecordMessage(ctx context.Context, conversationID, userText string) error {

@@ -7,6 +7,8 @@ export function CancelRun(arg1:string):Promise<void>;
 
 export function CreateConversation():Promise<conversations.Conversation>;
 
+export function DeleteConversation(arg1:string):Promise<void>;
+
 export function GetConversationMessages(arg1:string):Promise<Array<sessions.ChatMessage>>;
 
 export function GetSetting(arg1:string):Promise<string>;

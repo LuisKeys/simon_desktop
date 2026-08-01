@@ -10,6 +10,10 @@ export function CreateConversation() {
   return window['go']['app']['AppService']['CreateConversation']();
 }
 
+export function DeleteConversation(arg1) {
+  return window['go']['app']['AppService']['DeleteConversation'](arg1);
+}
+
 export function GetConversationMessages(arg1) {
   return window['go']['app']['AppService']['GetConversationMessages'](arg1);
 }
